@@ -136,6 +136,13 @@ wss.on("connection", (ws) => {
       const start = formatDate(startDate);
       const end = formatDate(endDate);
 
+      if (isNaN(Date.parse(start)) || isNaN(Date.parse(end))) {
+        return ws.send({ error: "Invalid date format, format date must in YYYY-MM-DD" });
+      }
+  
+      if (new Date(start) > new Date(end)) {
+        return ws.send({ error: "startDate must be before endDate" });
+      }
       // Construct the query object
       const query = {
         date: { $gte: start, $lte: end }, // Use the datetime field for comparison
