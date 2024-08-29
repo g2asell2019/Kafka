@@ -1,0 +1,56 @@
+version: '2'
+services:
+  zookeeper:
+    image: 'bitnami/zookeeper:latest'
+    restart: "no"
+    ports:
+      - '2181:2181'
+    environment:
+      - ZOO_PORT=2181
+      - ALLOW_ANONYMOUS_LOGIN=yes
+  kafka:
+    image: 'bitnami/kafka:latest'
+    restart: "no"
+    ports:
+      - '9092:9092'
+      - '29092:29092'
+    depends_on:
+      - "zookeeper"
+    environment:
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
+      - KAFKA_CFG_LISTENERS=INTERNAL://:29092,EXTERNAL://:9092
+      - KAFKA_CFG_ADVERTISED_LISTENERS=INTERNAL://kafka:29092,EXTERNAL://localhost:9092
+      - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
+      - KAFKA_INTER_BROKER_LISTENER_NAME=INTERNAL
+      - ALLOW_PLAINTEXT_LISTENER=yes
+      #- KAFKA_ADVERTISED_LISTENERS=INTERNAL://kafka:9092,EXTERNAL://localhost:9092
+      - KAFKA_ADVERTISED_LISTENERS=INTERNAL://kafka:9092,EXTERNAL://localhost:9092
+      - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1
+
+  # consumer_kafka:
+  #   build: ./ConsumerKafka
+  #     # context: ./ConsumerKafka
+  #     # dockerfile: ./ConsumerKafka/Dockerfile
+  #   restart: "no"
+  #   env_file:
+  #     - ./ConsumerKafka/.env
+  #   depends_on:
+  #     - "kafka"
+  #   links:
+  #     - "kafka"
+  producer_kafka:
+    build: ./Kafka
+    restart: "no"
+    env_file:
+      - ./Kafka/.env
+    depends_on:
+      - "kafka"
+    links:
+      - "kafka"
+  api:
+    build: ./API
+    restart: "no"
+    env_file:
+      - ./API/.env
+    ports:
+      - '8081:8081'
