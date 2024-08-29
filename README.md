@@ -153,10 +153,14 @@ http://localhost:3000
         ```json
         [
             {
-                "_id": "string",
-                "ticker": "string",
-                "price": "number",
-                "date": "string"
+                "_id": "123456",
+                "ticker": "BTH",
+                "date": "2024-08-29",
+                "open": 39,
+                "close": 39,
+                "high": 39,
+                "low": 39,
+                "volume": 100
             }
         ]
         ```
